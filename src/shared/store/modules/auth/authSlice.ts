@@ -16,7 +16,8 @@ export const logIn = createAsyncThunk(
   `${PREFIX}/logIn`,
   async (payload: User) => {
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay fake
-    const response = await api.post("/api/v1/auth/login");
+    const response = await api.get("/api/v1/auth/login");
+    console.log("response.data: ", response.data);
     api.defaults.headers["Authorization"] = `Bearer ${response.data.session}`;
     localStorage.setItem("user", JSON.stringify(payload));
     return payload;

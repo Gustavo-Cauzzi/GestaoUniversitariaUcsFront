@@ -1,5 +1,5 @@
 import React from "react";
-import { FiBook } from "react-icons/fi";
+import { FiAperture } from "react-icons/fi";
 import { twMerge } from "tailwind-merge";
 
 export const Logo: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
@@ -9,13 +9,13 @@ export const Logo: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   return (
     <strong
       className={twMerge(
-        `flex gap-2 items-center text-2xl text-white cursor-pointer ${
+        `flex gap-2 items-center text-xl text-white cursor-pointer ${
           className ?? ""
         }`
       )}
       {...props}
     >
-      <FiBook size={29} /> Gestão universitária UCS
+      <FiAperture size={25} /> Gestão universitária UCS
     </strong>
   );
 };
