@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.MuiButtonBase-root.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary {
+  &:not(.Mui-disabled) {
+    @apply bg-primary;
+  }
+  &:hover {
+    @apply bg-primary-dark;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+small,
+strong {
+  font-family: "Roboto", sans-serif;
+}
+
+body {
+  background: #fafafa;
+}
+
+.nice-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+  }
+}
+
+.MuiInputBase-input {
+  @apply nice-scrollbar;
+}
