@@ -11,15 +11,16 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
-import { FiPlusSquare } from "react-icons/fi";
+import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
 
 export const Universities: React.FC = () => {
   const [universities, setUniversities] = useState<Universidade[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [name, setName] = useState("");
+  const [selectionModel, setSelectionModel] = useState([] as number[]);
 
   const getData = async () => {
-    const toastId = toast.loading("Carregando dados ");
+    const toastId = toast.loading("Carregando dados...");
     const response = await api
       .get("/api/v1/universidade")
       .finally(() => toast.dismiss(toastId));
@@ -31,7 +32,7 @@ export const Universities: React.FC = () => {
   }, []);
 
   const handleSave = async () => {
-    const toastId = toast.loading("Carregando dados ");
+    const toastId = toast.loading("Salvando dados...");
     const response = await api.post("/api/v1/universidade", {
       desUniversidade: name,
     });
@@ -46,6 +47,15 @@ export const Universities: React.FC = () => {
     setName("");
   };
 
+  const handleDelete = async () => {
+    const toastId = toast.loading("Excluíndo dados...");
+    await Promise.all(
+      selectionModel.map((id) => api.delete(`/api/v1/universidade/${id}`))
+    );
+    toast.dismiss(toastId);
+    getData();
+  };
+
   return (
     <>
       <DataGrid
@@ -54,10 +64,20 @@ export const Universities: React.FC = () => {
           { field: "desUniversidade", flex: 1, headerName: "Descrição" },
         ]}
         rows={universities}
+        rowSelectionModel={selectionModel}
+        onRowSelectionModelChange={(s) => setSelectionModel(s as number[])}
         getRowId={(row) => row.codUniversidade}
+        checkboxSelection
       />
 
-      <div className="mt-2 flex justify-end">
+      <div className="mt-2 gap-4 flex justify-end">
+        <Button
+          startIcon={<FiTrash2 />}
+          onClick={handleDelete}
+          disabled={!selectionModel.length}
+        >
+          Remover
+        </Button>
         <Button
           variant="contained"
           startIcon={<FiPlusSquare />}
