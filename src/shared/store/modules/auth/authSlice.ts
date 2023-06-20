@@ -6,9 +6,15 @@ const PREFIX = "app/auth";
 
 export const getCurrentLoggedUser = createAsyncThunk<User | null, void>(
   `${PREFIX}/getCurrentLoggedUser`,
-  () => {
-    const userJson = localStorage.getItem("user");
-    return userJson ? (JSON.parse(userJson) as User) : null;
+  (_, { dispatch }) => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (!user || !token) {
+      dispatch(logOut());
+      return;
+    }
+    api.defaults.headers["Authorization"] = `Bearer ${token}`;
+    return token ? (JSON.parse(user) as User) : null;
   }
 );
 
@@ -17,9 +23,9 @@ export const logIn = createAsyncThunk(
   async (payload: User) => {
     await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay fake
     const response = await api.get("/api/v1/auth/login");
-    console.log("response.data: ", response.data);
     api.defaults.headers["Authorization"] = `Bearer ${response.data.session}`;
-    localStorage.setItem("user", JSON.stringify(payload));
+    localStorage.setItem("token", response.data.session);
+    localStorage.setItem("user", payload);
     return payload;
   }
 );
@@ -29,6 +35,7 @@ export const logOut = createAsyncThunk<void, void>(
   async () => {
     api.defaults.headers["Authorization"] = ``;
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
   }
 );
 
