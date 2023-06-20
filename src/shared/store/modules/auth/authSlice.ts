@@ -4,19 +4,19 @@ import { api } from "../../../services/api";
 
 const PREFIX = "app/auth";
 
-export const getCurrentLoggedUser = createAsyncThunk<User | null, void>(
-  `${PREFIX}/getCurrentLoggedUser`,
-  (_, { dispatch }) => {
-    const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
-    if (!user || !token) {
-      dispatch(logOut());
-      return;
-    }
-    api.defaults.headers["Authorization"] = `Bearer ${token}`;
-    return token ? (JSON.parse(user) as User) : null;
+export const getCurrentLoggedUser = createAsyncThunk<
+  User | null | undefined,
+  void
+>(`${PREFIX}/getCurrentLoggedUser`, (_, { dispatch }) => {
+  const token = localStorage.getItem("token");
+  const user = localStorage.getItem("user");
+  if (!user || !token) {
+    dispatch(logOut());
+    return;
   }
-);
+  api.defaults.headers["Authorization"] = `Bearer ${token}`;
+  return token ? (JSON.parse(user) as User) : null;
+});
 
 export const logIn = createAsyncThunk(
   `${PREFIX}/logIn`,
@@ -25,7 +25,7 @@ export const logIn = createAsyncThunk(
     const response = await api.get("/api/v1/auth/login");
     api.defaults.headers["Authorization"] = `Bearer ${response.data.session}`;
     localStorage.setItem("token", response.data.session);
-    localStorage.setItem("user", payload);
+    localStorage.setItem("user", JSON.stringify(payload));
     return payload;
   }
 );
