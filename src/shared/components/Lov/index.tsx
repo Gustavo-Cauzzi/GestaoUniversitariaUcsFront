@@ -27,7 +27,7 @@ interface ILovProps extends IBaseLovProps {
   ref?: React.Ref<ILovRef>;
 }
 
-const Lov = forwardRef<ILovRef, ILovProps>((props, ref) => {
+export const Lov = forwardRef<ILovRef, ILovProps>((props, ref) => {
   const {
     renderOption,
     getData,
@@ -49,6 +49,7 @@ const Lov = forwardRef<ILovRef, ILovProps>((props, ref) => {
     value,
     hideIdColumn = false,
     searchOnRender = false,
+    inputProps,
     ...rest
   } = props;
   const lovCommomProps = getLovCommomProps(props);
@@ -163,6 +164,7 @@ const Lov = forwardRef<ILovRef, ILovProps>((props, ref) => {
             placeholder={props.placeholder}
             error={props.error}
             onAddOpen={props.onAddOpen}
+            {...inputProps}
           />
         )}
         {...rest}
@@ -172,5 +174,3 @@ const Lov = forwardRef<ILovRef, ILovProps>((props, ref) => {
     </div>
   );
 });
-
-export default Lov;

@@ -6,8 +6,6 @@ import {
   TextField,
   useTheme,
 } from "@mui/material";
-import createStyles from "@mui/styles/createStyles";
-import makeStyles from "@mui/styles/makeStyles";
 import React from "react";
 import { FiPlus } from "react-icons/fi";
 import { RiSettings3Line } from "react-icons/ri";
@@ -22,27 +20,27 @@ interface ILovInput extends StandardTextFieldProps {
   codUm?: string;
 }
 
-export const useStyles = makeStyles(() =>
-  createStyles({
-    errorColor: {
-      color: "#f44336",
-    },
-    borderErrorColor: {
-      "& .MuiFilledInput-root:before": {
-        borderBottomColor: "#f44336",
-        borderBottomWidth: 2,
-      },
-      "& .MuiFilledInput-root:hover:before": {
-        borderBottomColor: "#f44336",
-        borderBottomWidth: 2,
-      },
-      "& .MuiFilledInput-root:after": {
-        borderBottomColor: "#f44336",
-        borderBottomWidth: 2,
-      },
-    },
-  })
-);
+// export const useStyles = makeStyles(() =>
+//   createStyles({
+//     errorColor: {
+//       color: "#f44336",
+//     },
+//     borderErrorColor: {
+//       "& .MuiFilledInput-root:before": {
+//         borderBottomColor: "#f44336",
+//         borderBottomWidth: 2,
+//       },
+//       "& .MuiFilledInput-root:hover:before": {
+//         borderBottomColor: "#f44336",
+//         borderBottomWidth: 2,
+//       },
+//       "& .MuiFilledInput-root:after": {
+//         borderBottomColor: "#f44336",
+//         borderBottomWidth: 2,
+//       },
+//     },
+//   })
+// );
 
 const LovInput: React.FC<ILovInput> = ({
   onAddOpenSettings,
@@ -55,10 +53,10 @@ const LovInput: React.FC<ILovInput> = ({
   ...props
 }) => {
   const theme = useTheme();
-  const classes = useStyles();
+  // const classes = useStyles();
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-1 mt-[5px]">
       {onAddOpen && (
         <div
           style={{ backgroundColor: theme.palette.primary.main }}
@@ -73,8 +71,6 @@ const LovInput: React.FC<ILovInput> = ({
         {...params}
         placeholder={placeholder}
         className="lovTextField"
-        variant="filled"
-        classes={{ root: error ? classes.borderErrorColor : undefined }}
         InputProps={{
           ...params.InputProps,
           className: `${params.InputProps.className}`,
@@ -86,23 +82,6 @@ const LovInput: React.FC<ILovInput> = ({
           ),
         }}
       />
-
-      {loading ? (
-        <div>
-          <IconButton size="small">
-            <CircularProgress color="inherit" size={20} />
-          </IconButton>
-        </div>
-      ) : (
-        <div>
-          <IconButton
-            size="small"
-            onClick={() => onAddOpenSettings && onAddOpenSettings()}
-          >
-            <RiSettings3Line size={20} color="#727272" />
-          </IconButton>
-        </div>
-      )}
     </div>
   );
 };

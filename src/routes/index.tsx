@@ -7,6 +7,7 @@ import { Universities } from "../pages/Universities";
 import { Auth } from "./layers/Auth";
 import { BaseLayout } from "./layouts/BaseLayout";
 import { Students } from "../pages/Students";
+import { SubjectCourses } from "../pages/SubjectCourse";
 
 export const AppRoutes = () => (
   <BrowserRouter>
@@ -19,6 +20,7 @@ export const AppRoutes = () => (
           <Route path="/course" element={<Courses />} />
           <Route path="/subjects" element={<Subjects />} />
           <Route path="/students" element={<Students />} />
+          <Route path="/subjectsCourses" element={<SubjectCourses />} />
         </Route>
       </Routes>
     </Auth>

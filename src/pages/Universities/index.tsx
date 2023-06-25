@@ -33,10 +33,9 @@ export const Universities: React.FC = () => {
 
   const handleSave = async () => {
     const toastId = toast.loading("Salvando dados...");
-    const response = await api.post("/api/v1/universidade", {
+    await api.post("/api/v1/universidade", {
       desUniversidade: name,
     });
-    console.log("response.data: ", response.data);
     toast.dismiss(toastId);
     getData();
     handleClose();

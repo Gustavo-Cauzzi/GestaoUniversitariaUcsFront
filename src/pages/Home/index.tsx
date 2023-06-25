@@ -1,5 +1,6 @@
 import { FaUniversity } from "react-icons/fa";
 import { FiClipboard, FiFile, FiLink, FiUser } from "react-icons/fi";
+import { MdSwitchAccount } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
 const menus = [
@@ -27,6 +28,11 @@ const menus = [
     title: "Curso",
     icon: FiClipboard,
     goTo: "/course",
+  },
+  {
+    title: "Cursos - Disciplinas",
+    icon: MdSwitchAccount,
+    goTo: "/subjectsCourses",
   },
 ];
 

@@ -18,10 +18,10 @@ export const generateGradient = (
   color: string,
   { darkCoefficient, lightCoefficient, degrees } = {} as GradientGeneratorConfig
 ) =>
-  `linear-gradient(${degrees ?? "109.6"}deg, ${lighten(color, lightCoefficient ?? 0.1)} 11.2%, ${darken(
+  `linear-gradient(${degrees ?? "109.6"}deg, ${lighten(
     color,
-    darkCoefficient ?? 0.2
-  )} 91.1%)`;
+    lightCoefficient ?? 0.1
+  )} 11.2%, ${darken(color, darkCoefficient ?? 0.2)} 91.1%)`;
 
 export const Header = () => {
   const theme = useTheme();
@@ -30,7 +30,9 @@ export const Header = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const name = useSelector<RootState, string | undefined>((state) => state.auth.user?.name);
+  const name = useSelector<RootState, string | undefined>(
+    (state) => state.auth.user?.name
+  );
 
   const handleLogout = () => {
     dispatch(logOut());
@@ -49,9 +51,9 @@ export const Header = () => {
         }}
       >
         <div className="flex gap-3 items-center">
-          <IconButton onClick={handleOpenSidebar}>
+          {/* <IconButton onClick={handleOpenSidebar}>
             <FiMenu size={25} color="#fff" />
-          </IconButton>
+          </IconButton> */}
           <Logo onClick={() => navigate("/")} />
         </div>
 

@@ -9,9 +9,10 @@ import {
   FormHelperText,
   Popper,
   PopperProps,
+  StandardTextFieldProps,
+  TextFieldProps,
   Theme,
 } from "@mui/material";
-import { makeStyles, createStyles } from "@mui/styles";
 import React, { ReactNode } from "react";
 import { ControllerRenderProps } from "react-hook-form";
 import { v4 } from "uuid";
@@ -90,6 +91,8 @@ export interface IBaseLovProps
     reason: LovChangeReason,
     details?: AutocompleteChangeDetails<any>
   ) => void | boolean | Promise<void | boolean>;
+
+  inputProps: StandardTextFieldProps;
 }
 
 export interface IBaseLovRef {
@@ -125,47 +128,47 @@ export const deleteFieldsFromObj = (
 export const isOnChangeValid = (onChangeResponse: void | boolean) =>
   onChangeResponse === undefined || onChangeResponse;
 
-const useLovStyles: any = makeStyles((theme: Theme) =>
-  createStyles({
-    errorColor: {
-      color: "#f44336",
-    },
-    borderErrorColor: {
-      "& .MuiInput-underline:before, .MuiInput-underline:hover:before, .MuiInput-underline:after":
-        {
-          borderBottomColor: "#f44336",
-          borderBottomWidth: 2,
-        },
-    },
-    colloredSvg: {
-      "&.Mui-focused .MuiAutocomplete-clearIndicator .MuiIconButton-label .MuiSvgIcon-root":
-        {
-          color:
-            theme.palette.primary.main /* cor do X para fechar quando focado*/,
-        },
-      "&.Mui-focused .MuiAutocomplete-popupIndicator .MuiIconButton-label .MuiSvgIcon-root":
-        {
-          color: theme.palette.primary.main,
-        },
-    },
-  })
-);
+// const useLovStyles: any = makeStyles((theme: Theme) =>
+//   createStyles({
+//     errorColor: {
+//       color: "#f44336",
+//     },
+//     borderErrorColor: {
+//       "& .MuiInput-underline:before, .MuiInput-underline:hover:before, .MuiInput-underline:after":
+//         {
+//           borderBottomColor: "#f44336",
+//           borderBottomWidth: 2,
+//         },
+//     },
+//     colloredSvg: {
+//       "&.Mui-focused .MuiAutocomplete-clearIndicator .MuiIconButton-label .MuiSvgIcon-root":
+//         {
+//           color:
+//             theme.palette.primary.main /* cor do X para fechar quando focado*/,
+//         },
+//       "&.Mui-focused .MuiAutocomplete-popupIndicator .MuiIconButton-label .MuiSvgIcon-root":
+//         {
+//           color: theme.palette.primary.main,
+//         },
+//     },
+//   })
+// );
 
-const generateAutocompleteClasses: any = (
-  minWidth: number,
-  flex: boolean,
-  width?: number,
-  maxWidth?: number
-) =>
-  makeStyles(() =>
-    createStyles({
-      autocomplete: {
-        minWidth,
-        maxWidth: maxWidth ?? "100%",
-        width: flex ? "100%" : width ?? 400,
-      },
-    })
-  )();
+// const generateAutocompleteClasses: any = (
+//   minWidth: number,
+//   flex: boolean,
+//   width?: number,
+//   maxWidth?: number
+// ) =>
+//   makeStyles(() =>
+//     createStyles({
+//       autocomplete: {
+//         minWidth,
+//         maxWidth: maxWidth ?? "100%",
+//         width: flex ? "100%" : width ?? 400,
+//       },
+//     })
+//   )();
 
 export const formatLovId = (id: any, showNegativeIds = false) => {
   if (!showNegativeIds) {
@@ -176,13 +179,13 @@ export const formatLovId = (id: any, showNegativeIds = false) => {
 };
 
 export const getLovCommomProps = (props: IBaseLovProps) => {
-  const classes = useLovStyles();
-  const autocompleteClasses = generateAutocompleteClasses(
-    props.minWidth,
-    props.fullWidth,
-    props.width,
-    props.maxWidth
-  );
+  // const classes = useLovStyles();
+  // const autocompleteClasses = generateAutocompleteClasses(
+  //   props.minWidth,
+  //   props.fullWidth,
+  //   props.width,
+  //   props.maxWidth
+  // );
 
   return {
     getOptionLabel(option: any) {
@@ -212,11 +215,10 @@ export const getLovCommomProps = (props: IBaseLovProps) => {
       option[Object.keys(option)[0]] === value[Object.keys(value)[0]],
     loadingText: "Carregando...",
     noOptionsText: props.noOptionsText ?? "Sem resultados",
-    className: `lovInput ${props.error ? "lov-underline-error" : ""} ${
-      classes.colloredSvg
-    }`,
+    className: `lovInput ${props.error ? "lov-underline-error" : ""}`,
+    // ${      classes.colloredSvg    }
     classes: {
-      root: autocompleteClasses.autocomplete,
+      // root: autocompleteClasses.autocomplete,
     },
     PopperComponent: (popperProps: PopperProps) => (
       <Popper
@@ -260,14 +262,11 @@ export const LovHelperText: React.FC<{
   error: IBaseLovProps["error"];
   helperText: IBaseLovProps["helperText"];
 }> = ({ helperText, error }) => {
-  const classes = useLovStyles();
+  // const classes = useLovStyles();
 
   return (
     <div className="w-full ml-[0.1125rem]">
-      <FormHelperText classes={{ root: error ? classes.errorColor : "" }}>
-        {" "}
-        {helperText}{" "}
-      </FormHelperText>
+      <FormHelperText> {helperText} </FormHelperText>
     </div>
   );
 };

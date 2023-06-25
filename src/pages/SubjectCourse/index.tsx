@@ -9,30 +9,30 @@ import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
-import { Aluno } from "../../shared/@types/Aluno";
-import { AlunoDisciplina } from "../../shared/@types/AlunoDisciplina";
+import { Curso } from "../../shared/@types/Curso";
 import { Disciplina } from "../../shared/@types/Disciplina";
+import { DisciplinaCurso } from "../../shared/@types/DisciplinaCurso";
 import { Lov } from "../../shared/components/Lov";
 import { api } from "../../shared/services/api";
 
-export const Enrollment: React.FC = () => {
-  const [enrollments, setEnrollments] = useState<AlunoDisciplina[]>([]);
+export const SubjectCourses: React.FC = () => {
+  const [courseSubjects, setCourseSubjects] = useState<DisciplinaCurso[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectionModel, setSelectionModel] = useState([] as number[]);
 
-  const [subject, setSubject] = useState<null | Disciplina>(null);
-  const [students, setStudents] = useState<Aluno[]>([]);
+  const [course, setCourses] = useState<null | Curso>(null);
+  const [subjects, setSubjects] = useState<Disciplina[]>([]);
   const [selectedStudentsToAdd, setSelectedStudentsToAdd] = useState<
-    Aluno["codAluno"][]
+    Disciplina["codDisciplina"][]
   >([]);
 
   const getData = async () => {
     const toastId = toast.loading("Carregando dados...");
-    api.get("/api/v1/aluno").then((res) => setStudents(res.data));
+    api.get("/api/v1/disciplina").then((res) => setSubjects(res.data));
     const response = await api
-      .get("/api/v1/alunoDisciplina")
+      .get("/api/v1/disciplinaCurso")
       .finally(() => toast.dismiss(toastId));
-    setEnrollments(response.data);
+    setCourseSubjects(response.data);
   };
 
   useEffect(() => {
@@ -40,20 +40,20 @@ export const Enrollment: React.FC = () => {
   }, []);
 
   const handleSave = async () => {
-    if (!subject) {
+    if (!course) {
       toast.error("Preencha todos os campos");
       return;
     }
     if (!selectedStudentsToAdd.length) {
-      toast.error("Selecione alunos para adicionar para essa disciplina");
+      toast.error("Selecione disciplinas para adicionar para essa curso");
       return;
     }
     const toastId = toast.loading("Salvando dados...");
     await Promise.all(
       selectedStudentsToAdd.map((studentId) =>
-        api.post("/api/v1/alunoDisciplina", {
-          codAluno: studentId,
-          codDisciplina: subject.codDisciplina,
+        api.post("/api/v1/disciplinaCurso", {
+          codDisciplina: studentId,
+          codCurso: course.codCurso,
         })
       )
     ).finally(() => toast.dismiss(toastId));
@@ -63,31 +63,30 @@ export const Enrollment: React.FC = () => {
   };
 
   const cleanFields = () => {
-    setSubject(null);
+    setCourses(null);
     setSelectedStudentsToAdd([]);
   };
 
   const handleClose = () => {
     setIsAddDialogOpen(false);
-    setSubject(null);
+    setCourses(null);
   };
 
   const handleDelete = async () => {
     const toastId = toast.loading("Excluíndo dados...");
     await Promise.all(
-      selectionModel.map((id) => api.delete(`/api/v1/alunoDisciplina/${id}`))
-    );
-    toast.dismiss(toastId);
+      selectionModel.map((id) => api.delete(`/api/v1/disciplinaCurso/${id}`))
+    ).finally(() => toast.dismiss(toastId));
     getData();
   };
 
   const getStudentsWhoAreNotInCurrentSubject = () => {
-    if (!subject) return [];
-    const studentsIdsOfCurrentSubject = enrollments
-      .filter((en) => en.codDisciplina === subject.codDisciplina)
-      .map((en) => en.codAluno);
-    return students.filter(
-      (st) => !studentsIdsOfCurrentSubject.includes(st.codAluno)
+    if (!course) return [];
+    const studentsIdsOfCurrentSubject = courseSubjects
+      .filter((en) => en.codCurso === course.codCurso)
+      .map((en) => en.codDisciplina);
+    return subjects.filter(
+      (st) => !studentsIdsOfCurrentSubject.includes(st.codDisciplina)
     );
   };
 
@@ -96,22 +95,22 @@ export const Enrollment: React.FC = () => {
       <DataGrid
         columns={[
           {
+            field: "desCurso",
+            headerName: "Curso",
+            flex: 1,
+            valueGetter: (p) => p.row.curso?.desCurso ?? "-",
+          },
+          {
             field: "desDisciplina",
             headerName: "Disciplina",
             flex: 1,
             valueGetter: (p) => p.row.disciplina?.desDisciplina ?? "-",
           },
-          {
-            field: "desAluno",
-            headerName: "Aluno",
-            flex: 1,
-            valueGetter: (p) => p.row.aluno?.desAluno ?? "-",
-          },
         ]}
-        rows={enrollments}
+        rows={courseSubjects}
         rowSelectionModel={selectionModel}
         onRowSelectionModelChange={(s) => setSelectionModel(s as number[])}
-        getRowId={(row) => row.codDisciplinaAluno}
+        getRowId={(row) => row.codDisciplinaCurso}
         checkboxSelection
       />
 
@@ -142,50 +141,55 @@ export const Enrollment: React.FC = () => {
         <DialogContent>
           <div className="flex flex-col mt-2 gap-4">
             <Lov
-              inputProps={{ label: "Disciplina" }}
-              value={subject}
+              inputProps={{ label: "Curso" }}
+              value={course}
               onChange={(_e, newValue) => {
                 setSelectedStudentsToAdd([]);
-                setSubject(newValue);
+                setCourses(newValue);
               }}
               getData={async () =>
-                api.get("/api/v1/disciplina").then((res) => res.data)
+                api.get<Curso[]>("/api/v1/cursos").then((res) =>
+                  res.data.map(({ codCurso, desCurso }) => ({
+                    codCurso,
+                    desCurso,
+                  }))
+                )
               }
             />
 
             <div
               className={`${
-                subject ? "" : "opacity-30"
+                course ? "" : "opacity-30"
               } transition-all flex items-center flex-col mt-4`}
             >
               <span
                 className={`${
-                  subject ? "opacity-0 mt-[-16px]" : ""
+                  course ? "opacity-0 mt-[-16px]" : ""
                 } transition-all`}
               >
-                Selecione uma disciplina para adicionar os alunos
+                Selecione uma curso para adicionar os disciplinas
               </span>
               <div className="w-full">
                 <DataGrid
                   columns={[
                     {
-                      field: "codAluno",
+                      field: "codDisciplina",
                       headerName: "Código",
-                      flex: 0.4,
+                      flex: 0.2,
                     },
                     {
-                      field: "desAluno",
-                      headerName: "Nome",
+                      field: "desDisciplina",
+                      headerName: "Disciplina",
                       flex: 1,
                     },
                   ]}
-                  getRowId={(row) => row.codAluno}
+                  getRowId={(row) => row.codDisciplina}
                   rows={getStudentsWhoAreNotInCurrentSubject()}
                   checkboxSelection
                   rowSelectionModel={selectedStudentsToAdd}
                   onRowSelectionModelChange={(newSelection) =>
                     setSelectedStudentsToAdd(
-                      newSelection as Aluno["codAluno"][]
+                      newSelection as Disciplina["codDisciplina"][]
                     )
                   }
                 />
