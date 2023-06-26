@@ -1,6 +1,6 @@
 import { DataGrid } from "@mui/x-data-grid";
 import { useEffect, useState } from "react";
-import { Universidade } from "../../shared/@types/Universities";
+import { Universidade } from "../../shared/@types/Universidade";
 import { api } from "../../shared/services/api";
 import { toast } from "react-hot-toast";
 import {

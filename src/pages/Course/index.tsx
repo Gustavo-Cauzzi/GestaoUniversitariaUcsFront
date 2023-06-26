@@ -13,10 +13,9 @@ import { FiTrash2, FiPlusSquare } from "react-icons/fi";
 import { Curso } from "../../shared/@types/Curso";
 import { Lov } from "../../shared/components/Lov";
 import { api } from "../../shared/services/api";
-import { Universidade } from "../../shared/@types/Universities";
+import { Universidade } from "../../shared/@types/Universidade";
 
 export const Courses: React.FC = () => {
-  const [university, setUniversity] = useState<Universidade | null>(null);
   const [cursos, setCursos] = useState<Curso[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [name, setName] = useState("");
@@ -35,14 +34,13 @@ export const Courses: React.FC = () => {
   }, []);
 
   const handleSave = async () => {
-    if (!university || !name) {
+    if (!name) {
       toast.error("Preencha os dados");
       return;
     }
     const toastId = toast.loading("Salvando dados...");
     await api.post("/api/v1/cursos", {
       desCurso: name,
-      codUniversidade: university.codUniversidade,
     });
     toast.dismiss(toastId);
     getData();
@@ -52,7 +50,6 @@ export const Courses: React.FC = () => {
 
   const cleanFields = () => {
     setName("");
-    setUniversity(null);
   };
 
   const handleClose = () => {
@@ -114,18 +111,6 @@ export const Courses: React.FC = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               label="Nome da curso"
-            />
-
-            <Lov
-              value={university}
-              onChange={(_e, newValue) => setUniversity(newValue)}
-              inputProps={{
-                label: "Universidade",
-              }}
-              noOptionsText="Nenhuma universidade encontrado"
-              getData={async () => {
-                return (await api.get("/api/v1/universidade")).data;
-              }}
             />
           </div>
         </DialogContent>

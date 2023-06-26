@@ -1,20 +1,23 @@
 import {
   Button,
   Dialog,
-  DialogActions,
-  DialogContent,
   DialogTitle,
+  DialogContent,
   TextField,
+  DialogActions,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
-import { Aluno } from "../../shared/@types/Aluno";
+import { FiTrash2, FiPlusSquare } from "react-icons/fi";
+import { Curso } from "../../shared/@types/Curso";
+import { Lov } from "../../shared/components/Lov";
 import { api } from "../../shared/services/api";
+import { Universidade } from "../../shared/@types/Universidade";
 
-export const Students: React.FC = () => {
-  const [alunos, setAlunos] = useState<Aluno[]>([]);
+export const Courses: React.FC = () => {
+  const [university, setUniversity] = useState<Universidade | null>(null);
+  const [cursos, setCursos] = useState<Curso[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [name, setName] = useState("");
   const [selectionModel, setSelectionModel] = useState([] as number[]);
@@ -22,9 +25,9 @@ export const Students: React.FC = () => {
   const getData = async () => {
     const toastId = toast.loading("Carregando dados...");
     const response = await api
-      .get("/api/v1/aluno")
+      .get("/api/v1/cursos")
       .finally(() => toast.dismiss(toastId));
-    setAlunos(response.data);
+    setCursos(response.data);
   };
 
   useEffect(() => {
@@ -32,13 +35,14 @@ export const Students: React.FC = () => {
   }, []);
 
   const handleSave = async () => {
-    if (!name) {
-      toast.error("Preencha todos os campos");
+    if (!university || !name) {
+      toast.error("Preencha os dados");
       return;
     }
     const toastId = toast.loading("Salvando dados...");
-    await api.post("/api/v1/aluno", {
-      desAluno: name,
+    await api.post("/api/v1/cursos", {
+      desCurso: name,
+      codUniversidade: university.codUniversidade,
     });
     toast.dismiss(toastId);
     getData();
@@ -48,6 +52,7 @@ export const Students: React.FC = () => {
 
   const cleanFields = () => {
     setName("");
+    setUniversity(null);
   };
 
   const handleClose = () => {
@@ -58,7 +63,7 @@ export const Students: React.FC = () => {
   const handleDelete = async () => {
     const toastId = toast.loading("Excluíndo dados...");
     await Promise.all(
-      selectionModel.map((id) => api.delete(`/api/v1/aluno/${id}`))
+      selectionModel.map((id) => api.delete(`/api/v1/curso/${id}`))
     );
     toast.dismiss(toastId);
     getData();
@@ -68,13 +73,14 @@ export const Students: React.FC = () => {
     <>
       <DataGrid
         columns={[
-          { field: "codAluno", flex: 1, headerName: "Código" },
-          { field: "desAluno", flex: 1, headerName: "Descrição" },
+          { field: "codCurso", flex: 1, headerName: "Código" },
+          { field: "desCurso", flex: 1, headerName: "Descrição" },
+          // { field: "desUniversidade", flex: 1, headerName: "Universidade", valueGetter:  },
         ]}
-        rows={alunos}
+        rows={cursos}
         rowSelectionModel={selectionModel}
         onRowSelectionModelChange={(s) => setSelectionModel(s as number[])}
-        getRowId={(row) => row.codAluno}
+        getRowId={(row) => row.codCurso}
         checkboxSelection
       />
 
@@ -107,7 +113,19 @@ export const Students: React.FC = () => {
             <TextField
               value={name}
               onChange={(e) => setName(e.target.value)}
-              label="Nome da aluno"
+              label="Nome da curso"
+            />
+
+            <Lov
+              value={university}
+              onChange={(_e, newValue) => setUniversity(newValue)}
+              inputProps={{
+                label: "Universidade",
+              }}
+              noOptionsText="Nenhuma universidade encontrado"
+              getData={async () => {
+                return (await api.get("/api/v1/universidade")).data;
+              }}
             />
           </div>
         </DialogContent>

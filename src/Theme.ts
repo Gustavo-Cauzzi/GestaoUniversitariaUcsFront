@@ -32,12 +32,6 @@ export const theme = createTheme({
         },
       },
     },
-    MuiTooltip: {
-      defaultProps: {
-        placement: "top",
-        arrow: true,
-      },
-    },
     MuiAccordion: {
       styleOverrides: {
         gutters: {
@@ -45,6 +39,12 @@ export const theme = createTheme({
           borderTopLeftRadius: "20px !important",
           borderTopRightRadius: "20px !important",
         },
+      },
+    },
+    MuiTooltip: {
+      defaultProps: {
+        placement: "top",
+        arrow: true,
       },
     },
     MuiAutocomplete: {
