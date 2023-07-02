@@ -10,13 +10,13 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
 import { Curso } from "../../shared/@types/Curso";
-import { CursoUniversidade } from "../../shared/@types/CursoUniversidade";
+import { UniversidadeCurso } from "../../shared/@types/UniversidadeCurso";
 import { Universidade } from "../../shared/@types/Universidade";
 import { Lov } from "../../shared/components/Lov";
 import { api } from "../../shared/services/api";
 
 export const UniversityCourse: React.FC = () => {
-  const [courseSubjects, setCourseSubjects] = useState<CursoUniversidade[]>([]);
+  const [courseSubjects, setCourseSubjects] = useState<UniversidadeCurso[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectionModel, setSelectionModel] = useState([] as number[]);
 

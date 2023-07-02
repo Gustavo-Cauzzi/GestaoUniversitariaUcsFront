@@ -9,6 +9,7 @@ import { BaseLayout } from "./layouts/BaseLayout";
 import { Students } from "../pages/Students";
 import { SubjectCourses } from "../pages/SubjectCourse";
 import { UniversityCourse } from "../pages/UniversityCourse";
+import { StudentSubject } from "../pages/StudentSubject";
 
 export const AppRoutes = () => (
   <BrowserRouter>
@@ -23,6 +24,7 @@ export const AppRoutes = () => (
           <Route path="/students" element={<Students />} />
           <Route path="/subjectsCourses" element={<SubjectCourses />} />
           <Route path="/universityCourse" element={<UniversityCourse />} />
+          <Route path="/studentSubject" element={<StudentSubject />} />
         </Route>
       </Routes>
     </Auth>

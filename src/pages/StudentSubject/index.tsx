@@ -10,17 +10,17 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FiPlusSquare, FiTrash2 } from "react-icons/fi";
 import { Aluno } from "../../shared/@types/Aluno";
-import { Matricula } from "../../shared/@types/Matricula";
-import { Curso } from "../../shared/@types/Curso";
+import { AlunoDisciplina } from "../../shared/@types/AlunoDisciplina";
+import { Disciplina } from "../../shared/@types/Disciplina";
 import { Lov } from "../../shared/components/Lov";
 import { api } from "../../shared/services/api";
 
-export const Enrollment: React.FC = () => {
-  const [enrollments, setEnrollments] = useState<Matricula[]>([]);
+export const StudentSubject: React.FC = () => {
+  const [studentsubjects, setStudentSubjects] = useState<AlunoDisciplina[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectionModel, setSelectionModel] = useState([] as number[]);
 
-  const [course, setCourse] = useState<null | Curso>(null);
+  const [subject, setSubject] = useState<null | Disciplina>(null);
   const [students, setStudents] = useState<Aluno[]>([]);
   const [selectedStudentsToAdd, setSelectedStudentsToAdd] = useState<
     Aluno["codAluno"][]
@@ -30,9 +30,9 @@ export const Enrollment: React.FC = () => {
     const toastId = toast.loading("Carregando dados...");
     api.get("/api/v1/aluno").then((res) => setStudents(res.data));
     const response = await api
-      .get("/api/v1/matricula")
+      .get("/api/v1/alunoDisciplina")
       .finally(() => toast.dismiss(toastId));
-    setEnrollments(response.data);
+    setStudentSubjects(response.data);
   };
 
   useEffect(() => {
@@ -40,20 +40,20 @@ export const Enrollment: React.FC = () => {
   }, []);
 
   const handleSave = async () => {
-    if (!course) {
+    if (!subject) {
       toast.error("Preencha todos os campos");
       return;
     }
     if (!selectedStudentsToAdd.length) {
-      toast.error("Selecione alunos para adicionar para essa curso");
+      toast.error("Selecione alunos para adicionar para essa disciplina");
       return;
     }
     const toastId = toast.loading("Salvando dados...");
     await Promise.all(
       selectedStudentsToAdd.map((studentId) =>
-        api.post("/api/v1/matricula", {
+        api.post("/api/v1/alunoDisciplina", {
           codAluno: studentId,
-          codCurso: course.codCurso,
+          codDisciplina: subject.codDisciplina,
         })
       )
     ).finally(() => toast.dismiss(toastId));
@@ -63,28 +63,28 @@ export const Enrollment: React.FC = () => {
   };
 
   const cleanFields = () => {
-    setCourse(null);
+    setSubject(null);
     setSelectedStudentsToAdd([]);
   };
 
   const handleClose = () => {
     setIsAddDialogOpen(false);
-    setCourse(null);
+    setSubject(null);
   };
 
   const handleDelete = async () => {
     const toastId = toast.loading("Excluíndo dados...");
     await Promise.all(
-      selectionModel.map((id) => api.delete(`/api/v1/matricula/${id}`))
+      selectionModel.map((id) => api.delete(`/api/v1/alunoDisciplina/${id}`))
     );
     toast.dismiss(toastId);
     getData();
   };
 
   const getStudentsWhoAreNotInCurrentSubject = () => {
-    if (!course) return [];
-    const studentsIdsOfCurrentSubject = enrollments
-      .filter((en) => en.codCurso === course.codCurso)
+    if (!subject) return [];
+    const studentsIdsOfCurrentSubject = studentsubjects
+      .filter((en) => en.codDisciplina === subject.codDisciplina)
       .map((en) => en.codAluno);
     return students.filter(
       (st) => !studentsIdsOfCurrentSubject.includes(st.codAluno)
@@ -96,10 +96,10 @@ export const Enrollment: React.FC = () => {
       <DataGrid
         columns={[
           {
-            field: "desCurso",
-            headerName: "Curso",
+            field: "desDisciplina",
+            headerName: "Disciplina",
             flex: 1,
-            valueGetter: (p) => p.row.curso?.desCurso ?? "-",
+            valueGetter: (p) => p.row.disciplina?.desDisciplina ?? "-",
           },
           {
             field: "desAluno",
@@ -108,10 +108,10 @@ export const Enrollment: React.FC = () => {
             valueGetter: (p) => p.row.aluno?.desAluno ?? "-",
           },
         ]}
-        rows={enrollments}
+        rows={studentsubjects}
         rowSelectionModel={selectionModel}
         onRowSelectionModelChange={(s) => setSelectionModel(s as number[])}
-        getRowId={(row) => row.codMatricula}
+        getRowId={(row) => row.codDisciplinaAluno}
         checkboxSelection
       />
 
@@ -142,33 +142,28 @@ export const Enrollment: React.FC = () => {
         <DialogContent>
           <div className="flex flex-col mt-2 gap-4">
             <Lov
-              inputProps={{ label: "Curso" }}
-              value={course}
+              inputProps={{ label: "Disciplina" }}
+              value={subject}
               onChange={(_e, newValue) => {
                 setSelectedStudentsToAdd([]);
-                setCourse(newValue);
+                setSubject(newValue);
               }}
               getData={async () =>
-                api.get<Curso[]>("/api/v1/cursos").then((res) =>
-                  res.data.map(({ codCurso, desCurso }) => ({
-                    codCurso,
-                    desCurso,
-                  }))
-                )
+                api.get("/api/v1/disciplina").then((res) => res.data)
               }
             />
 
             <div
               className={`${
-                course ? "" : "opacity-30"
+                subject ? "" : "opacity-30"
               } transition-all flex items-center flex-col mt-4`}
             >
               <span
                 className={`${
-                  course ? "opacity-0 mt-[-16px]" : ""
+                  subject ? "opacity-0 mt-[-16px]" : ""
                 } transition-all`}
               >
-                Selecione uma curso para adicionar os alunos
+                Selecione uma disciplina para adicionar os alunos
               </span>
               <div className="w-full">
                 <DataGrid

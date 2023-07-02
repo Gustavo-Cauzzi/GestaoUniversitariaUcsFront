@@ -8,9 +8,11 @@ import {
   FiFile,
   FiLink,
   FiUser,
+  FiUserCheck,
 } from "react-icons/fi";
 import { MdSwitchAccount } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { HomeDashboard } from "./HomeDashboard";
 
 const menus = [
   {
@@ -42,6 +44,12 @@ const relationMenu = [
     type: "relation",
   },
   {
+    title: "Estudante - Disciplinas",
+    icon: FiUserCheck,
+    goTo: "/studentSubject",
+    type: "relation",
+  },
+  {
     title: "Cursos - Disciplinas",
     icon: MdSwitchAccount,
     goTo: "/subjectsCourses",
@@ -59,7 +67,7 @@ export const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <Accordion className="w-full">
         <AccordionSummary expandIcon={<FiChevronDown />}>
           <h2 className="text-3xl text-primary">Cadastros</h2>
@@ -73,8 +81,10 @@ export const Home = () => {
                 <span>{menu.title}</span>
               </HomeButton>
             ))}
-            <hr className="my-2 col-span-2" />
-            <h3 className="col-span-2 text-2xl text-primary">Relações</h3>
+            <hr className="my-2 col-span-1 sm:col-span-2 lg:col-span-3" />
+            <h3 className="col-span-1 sm:col-span-2 lg:col-span-3 text-2xl text-primary">
+              Relações
+            </h3>
             {relationMenu.map((menu) => (
               <HomeButton onClick={() => navigate(menu.goTo)} key={menu.title}>
                 <menu.icon className="ml-[-1.5rem]" size={35} />
@@ -84,7 +94,9 @@ export const Home = () => {
           </div>
         </AccordionDetails>
       </Accordion>
-    </>
+
+      <HomeDashboard />
+    </div>
   );
 };
 

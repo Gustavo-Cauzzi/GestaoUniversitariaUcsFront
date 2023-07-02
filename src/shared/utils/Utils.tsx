@@ -22,7 +22,11 @@ export const confirmationToast = (msg: ReactNode) => {
               <Button size="small" onClick={() => dismiss(false)}>
                 Cancelar
               </Button>
-              <Button size="small" onClick={() => dismiss(true)} variant="contained">
+              <Button
+                size="small"
+                onClick={() => dismiss(true)}
+                variant="contained"
+              >
                 Confirmar
               </Button>
             </div>
@@ -33,3 +37,12 @@ export const confirmationToast = (msg: ReactNode) => {
     );
   });
 };
+
+export type FlattenObjectKeys<
+  T extends Record<string, unknown>,
+  Key = keyof T
+> = Key extends string
+  ? T[Key] extends Record<string, unknown>
+    ? `${Key}.${FlattenObjectKeys<T[Key]>}`
+    : `${Key}`
+  : never;
