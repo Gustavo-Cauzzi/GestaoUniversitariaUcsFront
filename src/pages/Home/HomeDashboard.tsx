@@ -3,11 +3,9 @@ import { useQuery } from "react-query";
 import { Curso } from "../../shared/@types/Curso";
 import { Universidade } from "../../shared/@types/Universidade";
 import { api } from "../../shared/services/api";
-import { CollapsibleTable } from "./components/CollapsibleTable";
-import { HomeAccordion } from "./components/HomeAccordion";
 import { HomeCard } from "./components/HomeCard";
 import { ValidInvalidTable } from "./components/ValidInvalidTable";
-import { UniversidadeCurso } from "../../shared/@types/UniversidadeCurso";
+import { Aluno } from "../../shared/@types/Aluno";
 
 const separateValidInvalid = <T,>(arr: T[], isValid: (elem: T) => boolean) =>
   arr.reduce(
@@ -43,6 +41,19 @@ export const HomeDashboard: React.FC = () => {
       );
   });
 
+  const { data: studentData } = useQuery("students", () => {
+    return api
+      .get<Aluno[]>("/api/v1/aluno")
+      .then((res) =>
+        separateValidInvalid(
+          res.data,
+          (row) =>
+            row.matriculas?.length === 1 &&
+            (row.alunoDisciplinas?.length ?? 0) >= 3
+        )
+      );
+  });
+
   return (
     <div className="flex flex-col gap-4">
       <HomeCard>
@@ -50,92 +61,44 @@ export const HomeDashboard: React.FC = () => {
         <span className="text-gray-600">
           Universidades deve ter ao menos 3 cursos cadastrados
         </span>
-        <HomeAccordion
-          title={`Inválidas (${universityData?.invalid.length ?? "-"})`}
-          variant="ERROR"
-        >
-          {universityData && (
-            <CollapsibleTable
-              data={universityData.invalid}
-              columns={[
-                {
-                  field: "codUniversidade",
-                  headerName: "Código",
-                  valueGetter: (params) => params.row.codUniversidade,
-                },
-                {
-                  field: "desUniversidade",
-                  headerName: "Universidade",
-                  valueGetter: (params) => params.row.desUniversidade,
-                },
-                {
-                  field: "cursos",
-                  headerName: "Qtd. Cursor",
-                  valueGetter: (params) => params.row.universidadeCurso.length,
-                },
-              ]}
-              getCollapsibleData={(row) => row.universidadeCurso}
-              collapsibleColumns={[
-                {
-                  field: "sad",
-                  headerName: "Código",
-                  valueGetter: (params) => params.row.codCurso,
-                },
-                {
-                  field: "desCurso",
-                  headerName: "Curso",
-                  valueGetter: (params) =>
-                    (params.row.curso as Curso)?.desCurso ?? "-",
-                },
-              ]}
-              getCollapsibleRowId={(row) => row.codCurso}
-              getRowId={(row) => row.codUniversidade}
-            />
-          )}
-        </HomeAccordion>
-        <HomeAccordion
-          title={`Válidas (${universityData?.invalid.length ?? "-"})`}
-          variant="SUCCESS"
-        >
-          {universityData && (
-            <CollapsibleTable
-              data={universityData.valid}
-              columns={[
-                {
-                  field: "codUniversidade",
-                  headerName: "Código",
-                  valueGetter: (params) => params.row.codUniversidade,
-                },
-                {
-                  field: "desUniversidade",
-                  headerName: "Universidade",
-                  valueGetter: (params) => params.row.desUniversidade,
-                },
-                {
-                  field: "cursos",
-                  headerName: "Qtd. Curso",
-                  valueGetter: (params) => params.row.universidadeCurso.length,
-                },
-              ]}
-              getCollapsibleData={(row) => row.universidadeCurso}
-              collapsibleColumns={[
-                {
-                  field: "sad",
-                  headerName: "Código",
-                  valueGetter: (params) => params.row.codCurso,
-                },
-                {
-                  field: "desCurso",
-                  headerName: "Curso",
-                  valueGetter: (params) =>
-                    (params.row as UniversidadeCurso).curso?.desCurso ?? "-",
-                },
-              ]}
-              getCollapsibleRowId={(row) => row.codCurso}
-              getRowId={(row) => row.codUniversidade}
-            />
-          )}
-        </HomeAccordion>
+
+        <ValidInvalidTable
+          data={universityData}
+          columns={[
+            {
+              field: "codUniversidade",
+              headerName: "Código",
+              valueGetter: (params) => params.row.codUniversidade,
+            },
+            {
+              field: "desUniversidade",
+              headerName: "Universidade",
+              valueGetter: (params) => params.row.desUniversidade,
+            },
+            {
+              field: "cursos",
+              headerName: "Qtd. Curso",
+              valueGetter: (params) => params.row.universidadeCurso.length,
+            },
+          ]}
+          collapsibleConfig={{
+            getCollapsibleData: (row) => row.universidadeCurso,
+            collapsibleColumns: [
+              {
+                field: "sad",
+                headerName: "Código",
+                valueGetter: (params) => params.row.codCurso,
+              },
+              {
+                field: "desCurso",
+                headerName: "Curso",
+                valueGetter: (params) => params.row.curso?.desCurso ?? "-",
+              },
+            ],
+            getCollapsibleRowId: (row) => row.codCurso,
+          }}
+          getRowId={(row) => row.codUniversidade}
+        />
       </HomeCard>
 
       <HomeCard>
@@ -172,6 +135,43 @@ export const HomeDashboard: React.FC = () => {
             },
           ]}
           getRowId={(row) => row.codCurso}
+        />
+      </HomeCard>
+
+      <HomeCard>
+        <h2 className="text-xl text-primary">Alunos</h2>
+        <span className="text-gray-600">
+          Um Aluno deve estar vinculado somente a um Curso e estar matriculado
+          em, no mínimo, três disciplinas
+        </span>
+
+        <ValidInvalidTable
+          data={studentData}
+          columns={[
+            {
+              field: "codAluno",
+              headerName: "Código",
+              flex: 1,
+            },
+            {
+              field: "desAluno",
+              headerName: "Curso",
+              flex: 1,
+            },
+            {
+              field: "alunoDisciplinas",
+              headerName: "Qtd. Disciplinas",
+              valueGetter: (params) => params.row.alunoDisciplinas?.length ?? 0,
+              flex: 1,
+            },
+            {
+              field: "matriculas",
+              headerName: "Qtd. Cursos",
+              valueGetter: (params) => params.row.matriculas?.length ?? 0,
+              flex: 1,
+            },
+          ]}
+          getRowId={(row) => row.codAluno}
         />
       </HomeCard>
     </div>
